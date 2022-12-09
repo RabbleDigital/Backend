@@ -85,3 +85,5 @@ export const GOOGLE_TYPES_MAP = new Map([
   ['boxing_gym', 'Exercise'],
   ['pilates_studio', 'Exercise'],
 ]);
+
+export const METRES_IN_MILE = 1609.344;

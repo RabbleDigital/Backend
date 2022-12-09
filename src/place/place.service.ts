@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Place, PlaceDocument } from './entities/place.model';
 import { Model } from 'mongoose';
 import { GoogleService } from '../shared/google/google.service';
-import { GOOGLE_TYPES_MAP } from '../shared/config/constants';
+import { GOOGLE_TYPES_MAP, METRES_IN_MILE } from '../shared/config/constants';
 
 @Injectable()
 export class PlaceService {
@@ -12,8 +12,17 @@ export class PlaceService {
     private readonly google: GoogleService,
   ) {}
 
-  findAll() {
-    return this.placeModel.find();
+  findAll(lat, lon, distance) {
+    const $maxDistance = +distance * METRES_IN_MILE;
+
+    return this.placeModel.find({
+      location: {
+        $near: {
+          $geometry: { type: 'Point', coordinates: [+lon, +lat] },
+          $maxDistance,
+        },
+      },
+    });
   }
 
   async findOne(placeId: string): Promise<Place> {

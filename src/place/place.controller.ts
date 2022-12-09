@@ -1,13 +1,14 @@
-import { Controller, Get, Param, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
 import { PlaceService } from './place.service';
 import MongooseClassSerializerInterceptor from '../shared/interceptors/mongooseClassSerializer.interceptor';
 import { Place } from './entities/place.model';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { PlaceVm } from './entities/place-vm.model';
 
 @Controller('places')
 @UseInterceptors(MongooseClassSerializerInterceptor(Place))
-@ApiTags('Posts')
+@ApiTags('Places')
+@ApiSecurity('ApiKey')
 export class PlaceController {
   constructor(private readonly placeService: PlaceService) {}
 
@@ -18,8 +19,12 @@ export class PlaceController {
     type: PlaceVm,
     isArray: true,
   })
-  findAll() {
-    return this.placeService.findAll();
+  findAll(
+    @Query('lat') lat: number,
+    @Query('lon') lon: number,
+    @Query('distance') distance: number,
+  ) {
+    return this.placeService.findAll(lat, lon, distance);
   }
 
   @Get(':id')
