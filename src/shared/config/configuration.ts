@@ -5,4 +5,9 @@ export default () => ({
   google: {
     api: process.env.GOOGLE_API_KEY,
   },
+  bestTime: {
+    url: process.env.BEST_TIME_URL,
+    privateKey: process.env.BEST_TIME_PRIVATE,
+    publicKey: process.env.BEST_TIME_PUBLIC,
+  },
 });

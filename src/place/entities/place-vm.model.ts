@@ -61,4 +61,10 @@ export class PlaceVm extends AbstractVmModel {
 
   @ApiProperty()
   readonly openingHours: OpeningHours;
+
+  @ApiProperty()
+  readonly crowd: number;
+
+  @ApiProperty()
+  readonly isHaveCrowd: boolean;
 }

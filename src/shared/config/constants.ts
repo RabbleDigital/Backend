@@ -87,3 +87,5 @@ export const GOOGLE_TYPES_MAP = new Map([
 ]);
 
 export const METRES_IN_MILE = 1609.344;
+
+export const WEEK_DAYS = [6, 0, 1, 2, 3, 4, 5];

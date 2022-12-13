@@ -1,7 +1,11 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { Transform } from 'class-transformer';
-import { OpeningHours, Location } from '../../shared/interfaces/place';
+import { Exclude, Transform } from 'class-transformer';
+import {
+  OpeningHours,
+  Location,
+  PlaceForecast,
+} from '../../shared/interfaces/place';
 
 const locationRaw = {
   type: {
@@ -27,6 +31,14 @@ const openingHoursRaw = {
   ],
   text: [String],
 };
+
+const forecastRaw = [
+  {
+    _id: false,
+    dayInt: Number,
+    crowdMeter: [Number],
+  },
+];
 
 export type PlaceDocument = HydratedDocument<Place>;
 
@@ -64,6 +76,20 @@ export class Place {
 
   @Prop(raw(openingHoursRaw))
   readonly openingHours: OpeningHours;
+
+  @Prop(raw(forecastRaw))
+  @Exclude()
+  readonly forecast: PlaceForecast;
+
+  @Prop()
+  readonly crowd: number;
+
+  @Prop({ default: false })
+  readonly isHaveCrowd: boolean;
+
+  @Prop()
+  @Exclude()
+  readonly venueId: string;
 }
 
 export const PlaceModel = SchemaFactory.createForClass(Place);
