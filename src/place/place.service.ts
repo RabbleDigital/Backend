@@ -97,8 +97,9 @@ export class PlaceService {
   private transform(place, photo) {
     return {
       title: place.name,
-      city: place.address_components.find((e) => e.types.includes('locality'))
-        .long_name,
+      city: place.address_components.find(
+        (e) => e.types.includes('locality') || e.types.includes('postal_town'),
+      ).long_name,
       address: place.formatted_address,
       location: {
         type: 'Point',
