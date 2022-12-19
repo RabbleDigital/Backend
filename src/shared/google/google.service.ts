@@ -3,6 +3,8 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 
+import { PlacePhoto } from '../interfaces/google';
+
 @Injectable()
 export class GoogleService {
   constructor(
@@ -25,11 +27,7 @@ export class GoogleService {
     return data;
   }
 
-  async getPlacePhoto({
-    photo_reference,
-    width,
-    height,
-  }: Record<string, string | number>) {
+  async getPlacePhoto({ photo_reference, width, height }: PlacePhoto) {
     const { data } = await firstValueFrom(
       this.httpService
         .get('https://maps.googleapis.com/maps/api/place/photo', {

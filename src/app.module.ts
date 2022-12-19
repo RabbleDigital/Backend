@@ -1,12 +1,14 @@
 import { Module, MiddlewareConsumer } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './shared/middlewares/auth.middleware';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PlaceModule } from './place/place.module';
-import configuration from './shared/config/configuration';
-import { MongooseModule } from '@nestjs/mongoose';
 import { GoogleModule } from './shared/google/google.module';
 import { LogsMiddleware } from './shared/middlewares/logs.middleware';
+import { ReportModule } from './report/report.module';
+import configuration from './shared/config/configuration';
 
 @Module({
   imports: [
@@ -21,6 +23,7 @@ import { LogsMiddleware } from './shared/middlewares/logs.middleware';
     AuthModule,
     PlaceModule,
     GoogleModule,
+    ReportModule,
   ],
 })
 export class AppModule {

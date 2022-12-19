@@ -1,18 +1,15 @@
 import { Module } from '@nestjs/common';
+
 import { PlaceService } from './place.service';
 import { PlaceController } from './place.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Place, PlaceModel } from './entities/place.model';
 import { GoogleModule } from '../shared/google/google.module';
 import { BestTimeModule } from '../shared/best-time/best-time.module';
+import { PlaceRepositoryModule } from './repository/place.repository.module';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Place.name, schema: PlaceModel }]),
-    GoogleModule,
-    BestTimeModule,
-  ],
+  imports: [PlaceRepositoryModule, GoogleModule, BestTimeModule],
   controllers: [PlaceController],
   providers: [PlaceService],
+  exports: [PlaceService],
 })
 export class PlaceModule {}

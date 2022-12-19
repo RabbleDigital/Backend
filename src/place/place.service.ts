@@ -1,19 +1,21 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Place, PlaceDocument } from './entities/place.model';
-import { Model } from 'mongoose';
+import { Injectable, NotFoundException } from '@nestjs/common';
+
+import { PlaceRepository } from './repository/place.repository';
 import { GoogleService } from '../shared/google/google.service';
 import { BestTimeService } from '../shared/best-time/best-time.service';
+import { Place } from './repository/place.entity';
 import {
   GOOGLE_TYPES_MAP,
   METRES_IN_MILE,
   WEEK_DAYS,
 } from '../shared/config/constants';
+import { PlaceDto } from './dto/place.dto';
+import { PlaceDetails } from '../shared/interfaces/google';
 
 @Injectable()
 export class PlaceService {
   constructor(
-    @InjectModel(Place.name) private placeModel: Model<PlaceDocument>,
+    private readonly placeRepository: PlaceRepository,
     private readonly google: GoogleService,
     private readonly bestTime: BestTimeService,
   ) {}
@@ -21,7 +23,7 @@ export class PlaceService {
   async findAll(lat, lon, distance) {
     const $maxDistance = +distance * METRES_IN_MILE;
 
-    const places = await this.placeModel.find({
+    const places = await this.placeRepository.findAll({
       location: {
         $near: {
           $geometry: { type: 'Point', coordinates: [+lon, +lat] },
@@ -30,18 +32,29 @@ export class PlaceService {
       },
     });
 
-    return places.map((place) => this.crowdTransform(place));
+    return places.map((place) => new PlaceDto(this.crowdTransform(place)));
   }
 
   async findOne(placeId: string) {
-    let place: Place = await this.placeModel.findOne({ placeId });
+    let place: Place = await this.placeRepository.findOne({ placeId });
     if (!place) place = await this.findInGoogle(placeId);
 
-    return this.crowdTransform(place);
+    return new PlaceDto(this.crowdTransform(place));
+  }
+
+  async findOneById(id: string) {
+    const place = await this.placeRepository.findOneById(id);
+    if (!place) throw new NotFoundException({ message: 'Place not Found' });
+
+    return place;
+  }
+
+  updateOneById(id: string, body) {
+    return this.placeRepository.updateOneById(id, body);
   }
 
   private async findInGoogle(placeId) {
-    const { result } = await this.google.getPlaceDetails(placeId);
+    const { result }: PlaceDetails = await this.google.getPlaceDetails(placeId);
 
     const { responseUrl } = await this.google.getPlacePhoto(result.photos[0]);
 
@@ -49,7 +62,7 @@ export class PlaceService {
 
     const forecast = await this.getCrowdInfo(transformed);
 
-    return this.placeModel.create({ ...transformed, ...forecast });
+    return this.placeRepository.create({ ...transformed, ...forecast });
   }
 
   private async getCrowdInfo(place) {
@@ -108,10 +121,10 @@ export class PlaceService {
       placeId: place.place_id,
       photo,
       openingHours: {
-        periods: place.opening_hours.periods,
-        text: place.opening_hours.weekday_text,
+        periods: place?.opening_hours?.periods,
+        text: place?.opening_hours?.weekday_text,
       },
-      category: this.findCategory(place.types),
+      category: this.findCategory(place.types) || 'Other',
     };
   }
 
