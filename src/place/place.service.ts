@@ -107,7 +107,7 @@ export class PlaceService {
     };
   }
 
-  private crowdTransform(place) {
+  crowdTransform(place) {
     if (!place.isHaveCrowd) return place;
 
     const currentTime = new Date();

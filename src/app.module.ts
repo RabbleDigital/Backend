@@ -8,6 +8,7 @@ import { PlaceModule } from './place/place.module';
 import { GoogleModule } from './shared/google/google.module';
 import { LogsMiddleware } from './shared/middlewares/logs.middleware';
 import { ReportModule } from './report/report.module';
+import { AdminModule } from './admin/admin.module';
 import configuration from './shared/config/configuration';
 
 @Module({
@@ -24,6 +25,7 @@ import configuration from './shared/config/configuration';
     PlaceModule,
     GoogleModule,
     ReportModule,
+    AdminModule,
   ],
 })
 export class AppModule {

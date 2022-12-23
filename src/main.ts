@@ -14,6 +14,7 @@ async function bootstrap() {
     .setTitle('Rabble API')
     .setVersion('1.0')
     .addApiKey({ type: 'apiKey', name: 'ApiKey', in: 'header' })
+    .addBearerAuth(undefined, 'bearerAuth')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);

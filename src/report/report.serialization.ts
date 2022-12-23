@@ -1,11 +1,17 @@
-import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiProperty, ApiResponse } from '@nestjs/swagger';
+import {
+  applyDecorators,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiProperty, ApiResponse } from '@nestjs/swagger';
 
 import { ReportDto } from './dto/report.dto';
 import {
   IBadRequestException,
   IUnauthorizedException,
 } from '../shared/interfaces/error';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
 class ReportSerialization {
   @ApiProperty()
@@ -43,6 +49,8 @@ export function FindReports(): PropertyDecorator {
       status: 200,
       type: ReportSerialization,
     }),
+    ApiBearerAuth(),
+    UseGuards(JwtAuthGuard),
   );
 }
 
@@ -53,6 +61,8 @@ export function AdjustReport(): PropertyDecorator {
       description: 'Success',
       status: 204,
     }),
+    ApiBearerAuth(),
+    UseGuards(JwtAuthGuard),
   );
 }
 
@@ -63,5 +73,7 @@ export function ArchiveReport(): PropertyDecorator {
       description: 'Success',
       status: 204,
     }),
+    ApiBearerAuth(),
+    UseGuards(JwtAuthGuard),
   );
 }

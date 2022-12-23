@@ -8,6 +8,7 @@ import { ReportRepository } from './repository/report.repository';
 import { ReportDto } from './dto/report.dto';
 import { PlaceService } from '../place/place.service';
 import { ReportStatus } from './repository/report.entity';
+import { PlaceDto } from '../place/dto/place.dto';
 
 @Injectable()
 export class ReportService {
@@ -24,14 +25,14 @@ export class ReportService {
     const day = WEEK_DAYS[currentTime.getDay()];
     const hour = currentTime.getHours();
 
-    const place = await this.placeService.findOneById(createReportDto.place);
+    let place = await this.placeService.findOneById(createReportDto.place);
     if (!place.isHaveCrowd) {
       const forecast = times(7, (index) => ({
         dayInt: index,
         crowdMeter: times(24, () => createReportDto.crowd),
       }));
 
-      await this.placeService.updateOneById(place._id.toString(), {
+      place = await this.placeService.updateOneById(place._id.toString(), {
         forecast,
         isHaveCrowd: true,
       });
@@ -39,19 +40,24 @@ export class ReportService {
       status = ReportStatus.AutoAdjusted;
     }
 
-    return this.reportRepository
-      .create({ ...createReportDto, day, hour, status })
-      .then((report) => new ReportDto(report));
+    await this.reportRepository.create({
+      ...createReportDto,
+      day,
+      hour,
+      status,
+    });
+
+    return new PlaceDto(this.placeService.crowdTransform(place));
   }
 
-  async findAll(page, limit) {
+  async findAll(status, page, limit) {
     const skip: number = this.paginationService.skip(page, limit);
     const join = { path: 'place', select: 'title category address photo' };
 
-    const count = await this.reportRepository.getTotal();
+    const count = await this.reportRepository.getTotal({ status });
     const rows = await this.reportRepository
       .findAll(
-        {},
+        { status },
         {
           skip,
           limit,

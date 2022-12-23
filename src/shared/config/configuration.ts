@@ -10,4 +10,11 @@ export default () => ({
     privateKey: process.env.BEST_TIME_PRIVATE,
     publicKey: process.env.BEST_TIME_PUBLIC,
   },
+  jwt: {
+    secret: process.env.JWT_SECRET,
+  },
+  admin: {
+    email: process.env.ADMIN_EMAIL,
+    password: process.env.ADMIN_PASSWORD,
+  },
 });

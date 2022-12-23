@@ -25,8 +25,8 @@ export class ReportController {
 
   @Get()
   @FindReports()
-  findAll(@Query() { page, limit }: FindReportsDto) {
-    return this.reportService.findAll(page, limit);
+  findAll(@Query() { status, page, limit }: FindReportsDto) {
+    return this.reportService.findAll(status, page, limit);
   }
 
   @Put(':id/adjust')
