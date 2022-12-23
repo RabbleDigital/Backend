@@ -10,7 +10,8 @@ export const ReportDatabaseName = 'reports';
 export enum ReportStatus {
   Active = 'active',
   Adjusted = 'adjusted',
-  archived = 'archived',
+  AutoAdjusted = 'autoAdjusted',
+  Archived = 'archived',
 }
 
 @DatabaseEntity({ collection: ReportDatabaseName })

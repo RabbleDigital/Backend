@@ -42,6 +42,22 @@ export class PlaceService {
     return new PlaceDto(this.crowdTransform(place));
   }
 
+  async findOneWithUpdate(id) {
+    let place = await this.findOneById(id);
+
+    const currentTime = new Date();
+
+    const diff =
+      Math.abs(place.updatedAt.getTime() - currentTime.getTime()) / 3600000;
+
+    if (diff > 3 && place.venueId) {
+      const { forecast } = await this.getCrowdInfo(place);
+      place = await this.updateOneById(id, { forecast });
+    }
+
+    return new PlaceDto(this.crowdTransform(place));
+  }
+
   async findOneById(id: string) {
     const place = await this.placeRepository.findOneById(id);
     if (!place) throw new NotFoundException({ message: 'Place not Found' });

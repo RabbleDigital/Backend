@@ -55,3 +55,13 @@ export function AdjustReport(): PropertyDecorator {
     }),
   );
 }
+
+export function ArchiveReport(): PropertyDecorator {
+  return applyDecorators(
+    HttpCode(HttpStatus.NO_CONTENT),
+    ApiResponse({
+      description: 'Success',
+      status: 204,
+    }),
+  );
+}

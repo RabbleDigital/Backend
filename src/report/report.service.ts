@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { times } from 'lodash';
 
 import { CreateReportDto } from './dto/create-report.dto';
 import { WEEK_DAYS } from '../shared/config/constants';
@@ -6,6 +7,7 @@ import { PaginationService } from '../shared/pagination/services/pagination.serv
 import { ReportRepository } from './repository/report.repository';
 import { ReportDto } from './dto/report.dto';
 import { PlaceService } from '../place/place.service';
+import { ReportStatus } from './repository/report.entity';
 
 @Injectable()
 export class ReportService {
@@ -15,13 +17,30 @@ export class ReportService {
     private readonly paginationService: PaginationService,
   ) {}
 
-  create(createReportDto: CreateReportDto) {
+  async create(createReportDto: CreateReportDto) {
+    let status;
+
     const currentTime = new Date();
     const day = WEEK_DAYS[currentTime.getDay()];
     const hour = currentTime.getHours();
 
+    const place = await this.placeService.findOneById(createReportDto.place);
+    if (!place.isHaveCrowd) {
+      const forecast = times(7, (index) => ({
+        dayInt: index,
+        crowdMeter: times(24, () => createReportDto.crowd),
+      }));
+
+      await this.placeService.updateOneById(place._id.toString(), {
+        forecast,
+        isHaveCrowd: true,
+      });
+
+      status = ReportStatus.AutoAdjusted;
+    }
+
     return this.reportRepository
-      .create({ ...createReportDto, day, hour })
+      .create({ ...createReportDto, day, hour, status })
       .then((report) => new ReportDto(report));
   }
 
@@ -44,9 +63,15 @@ export class ReportService {
     return { count, rows };
   }
 
-  async adjust(id: string) {
+  async findById(id) {
     const report = await this.reportRepository.findOneById(id);
     if (!report) throw new NotFoundException({ message: 'Report not Found' });
+
+    return report;
+  }
+
+  async adjust(id: string) {
+    const report = await this.findById(id);
 
     const place = await this.placeService.findOneById(report.place.toString());
 
@@ -56,6 +81,20 @@ export class ReportService {
 
     await this.placeService.updateOneById(report.place.toString(), {
       forecast,
+    });
+
+    await this.reportRepository.updateOneById(id, {
+      status: ReportStatus.Adjusted,
+    });
+
+    return;
+  }
+
+  async archive(id: string) {
+    const report = await this.findById(id);
+
+    await this.reportRepository.updateOneById(report._id.toString(), {
+      status: ReportStatus.Archived,
     });
 
     return;

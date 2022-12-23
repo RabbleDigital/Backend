@@ -6,6 +6,7 @@ import { CreateReportDto } from './dto/create-report.dto';
 import { FindReportsDto } from './dto/find-reports.dto';
 import {
   AdjustReport,
+  ArchiveReport,
   CreateReport,
   FindReports,
 } from './report.serialization';
@@ -32,5 +33,11 @@ export class ReportController {
   @AdjustReport()
   adjust(@Param('id') id: string) {
     return this.reportService.adjust(id);
+  }
+
+  @Put(':id/archive')
+  @ArchiveReport()
+  archive(@Param('id') id: string) {
+    return this.reportService.archive(id);
   }
 }

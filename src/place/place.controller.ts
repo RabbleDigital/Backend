@@ -3,7 +3,11 @@ import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 
 import { PlaceService } from './place.service';
 import { FindPlacesDto } from './dto/find-places.dto';
-import { FindPlace, FindPlaces } from './place.serialization';
+import {
+  FindPlaceAndCheck,
+  FindPlace,
+  FindPlaces,
+} from './place.serialization';
 
 @Controller('places')
 @ApiTags('Places')
@@ -21,5 +25,11 @@ export class PlaceController {
   @FindPlace()
   findOne(@Param('id') id: string) {
     return this.placeService.findOne(id);
+  }
+
+  @Get(':id/check')
+  @FindPlaceAndCheck()
+  findOneAndCheck(@Param('id') id: string) {
+    return this.placeService.findOneWithUpdate(id);
   }
 }

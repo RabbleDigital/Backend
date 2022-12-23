@@ -22,3 +22,13 @@ export function FindPlace(): PropertyDecorator {
     }),
   );
 }
+
+export function FindPlaceAndCheck(): PropertyDecorator {
+  return applyDecorators(
+    ApiResponse({
+      description: 'Success',
+      status: 200,
+      type: PlaceDto,
+    }),
+  );
+}
