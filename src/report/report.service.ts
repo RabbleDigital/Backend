@@ -9,6 +9,7 @@ import { ReportDto } from './dto/report.dto';
 import { PlaceService } from '../place/place.service';
 import { ReportStatus } from './repository/report.entity';
 import { PlaceDto } from '../place/dto/place.dto';
+import { ENUM_PAGINATION_SORT_TYPE } from '../shared/pagination/constants/pagination.enum.constant';
 
 @Injectable()
 export class ReportService {
@@ -62,6 +63,7 @@ export class ReportService {
           skip,
           limit,
           join,
+          sort: { createdAt: ENUM_PAGINATION_SORT_TYPE.DESC },
         },
       )
       .then((reports) => reports.map((report) => new ReportDto(report)));
