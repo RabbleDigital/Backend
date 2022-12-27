@@ -10,6 +10,7 @@ import { PlaceService } from '../place/place.service';
 import { ReportStatus } from './repository/report.entity';
 import { PlaceDto } from '../place/dto/place.dto';
 import { ENUM_PAGINATION_SORT_TYPE } from '../shared/pagination/constants/pagination.enum.constant';
+import { PlaceDateDto } from '../place/dto/place-date.dto';
 
 @Injectable()
 export class ReportService {
@@ -19,12 +20,9 @@ export class ReportService {
     private readonly paginationService: PaginationService,
   ) {}
 
-  async create(createReportDto: CreateReportDto) {
+  async create(createReportDto: CreateReportDto, { day, hour }: PlaceDateDto) {
     let status;
-
-    const currentTime = new Date();
-    const day = WEEK_DAYS[currentTime.getDay()];
-    const hour = currentTime.getHours();
+    const currentDay = WEEK_DAYS[day];
 
     let place = await this.placeService.findOneById(createReportDto.place);
     if (!place.isHaveCrowd) {
@@ -43,12 +41,12 @@ export class ReportService {
 
     await this.reportRepository.create({
       ...createReportDto,
-      day,
+      day: currentDay,
       hour,
       status,
     });
 
-    return new PlaceDto(this.placeService.crowdTransform(place));
+    return new PlaceDto(this.placeService.crowdTransform(place, { day, hour }));
   }
 
   async findAll(status, page, limit) {
@@ -78,21 +76,28 @@ export class ReportService {
     return report;
   }
 
-  async adjust(id: string) {
+  async adjust(id: string, custom: number) {
     const report = await this.findById(id);
 
     const place = await this.placeService.findOneById(report.place.toString());
 
     const forecast = [...place.forecast];
 
-    forecast[report.day].crowdMeter[report.hour] = report.crowd;
+    if (custom) {
+      forecast[report.day].crowdMeter[report.hour] = custom;
+      await this.reportRepository.updateOneById(id, {
+        status: ReportStatus.Adjusted,
+        crowd: custom,
+      });
+    } else {
+      forecast[report.day].crowdMeter[report.hour] = report.crowd;
+      await this.reportRepository.updateOneById(id, {
+        status: ReportStatus.Adjusted,
+      });
+    }
 
     await this.placeService.updateOneById(report.place.toString(), {
       forecast,
-    });
-
-    await this.reportRepository.updateOneById(id, {
-      status: ReportStatus.Adjusted,
     });
 
     return;

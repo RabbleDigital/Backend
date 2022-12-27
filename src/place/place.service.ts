@@ -11,6 +11,7 @@ import {
 } from '../shared/config/constants';
 import { PlaceDto } from './dto/place.dto';
 import { PlaceDetails } from '../shared/interfaces/google';
+import { PlaceDateDto } from './dto/place-date.dto';
 
 @Injectable()
 export class PlaceService {
@@ -20,7 +21,7 @@ export class PlaceService {
     private readonly bestTime: BestTimeService,
   ) {}
 
-  async findAll(lat, lon, distance) {
+  async findAll(lat, lon, distance, { day, hour }: PlaceDateDto) {
     const $maxDistance = +distance * METRES_IN_MILE;
 
     const places = await this.placeRepository.findAll({
@@ -32,17 +33,19 @@ export class PlaceService {
       },
     });
 
-    return places.map((place) => new PlaceDto(this.crowdTransform(place)));
+    return places.map(
+      (place) => new PlaceDto(this.crowdTransform(place, { day, hour })),
+    );
   }
 
-  async findOne(placeId: string) {
+  async findOne(placeId: string, { day, hour }: PlaceDateDto) {
     let place: Place = await this.placeRepository.findOne({ placeId });
     if (!place) place = await this.findInGoogle(placeId);
 
-    return new PlaceDto(this.crowdTransform(place));
+    return new PlaceDto(this.crowdTransform(place, { day, hour }));
   }
 
-  async findOneWithUpdate(id) {
+  async findOneWithUpdate(id, { day, hour }: PlaceDateDto) {
     let place = await this.findOneById(id);
 
     const currentTime = new Date();
@@ -55,7 +58,7 @@ export class PlaceService {
       place = await this.updateOneById(id, { forecast });
     }
 
-    return new PlaceDto(this.crowdTransform(place));
+    return new PlaceDto(this.crowdTransform(place, { day, hour }));
   }
 
   async findOneById(id: string) {
@@ -107,19 +110,18 @@ export class PlaceService {
     };
   }
 
-  crowdTransform(place) {
+  crowdTransform(place, { day, hour }: PlaceDateDto) {
     if (!place.isHaveCrowd) return place;
 
-    const currentTime = new Date();
-    const currentDay = WEEK_DAYS[currentTime.getDay()];
-    const currentHour = currentTime.getHours();
+    const currentDay = WEEK_DAYS[day];
 
-    const currentForecastDay = place.forecast.find(
-      (day) => day.dayInt === currentDay,
-    );
+    const forecast = new Map();
+    place.forecast.map((day) => forecast.set(day.dayInt, day));
+
+    const currentForecastDay = forecast.get(currentDay);
 
     return Object.assign(place, {
-      crowd: currentForecastDay.crowdMeter[currentHour],
+      crowd: currentForecastDay.crowdMeter[hour],
     });
   }
 

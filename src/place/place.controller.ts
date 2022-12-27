@@ -8,6 +8,7 @@ import {
   FindPlace,
   FindPlaces,
 } from './place.serialization';
+import { PlaceDateDto } from './dto/place-date.dto';
 
 @Controller('places')
 @ApiTags('Places')
@@ -17,19 +18,25 @@ export class PlaceController {
 
   @Get()
   @FindPlaces()
-  findAll(@Query() { lat, lon, distance }: FindPlacesDto) {
-    return this.placeService.findAll(lat, lon, distance);
+  findAll(
+    @Query() { lat, lon, distance }: FindPlacesDto,
+    @Query() placeDateDto: PlaceDateDto,
+  ) {
+    return this.placeService.findAll(lat, lon, distance, placeDateDto);
   }
 
   @Get(':id')
   @FindPlace()
-  findOne(@Param('id') id: string) {
-    return this.placeService.findOne(id);
+  findOne(@Param('id') id: string, @Query() placeDateDto: PlaceDateDto) {
+    return this.placeService.findOne(id, placeDateDto);
   }
 
   @Get(':id/check')
   @FindPlaceAndCheck()
-  findOneAndCheck(@Param('id') id: string) {
-    return this.placeService.findOneWithUpdate(id);
+  findOneAndCheck(
+    @Param('id') id: string,
+    @Query() placeDateDto: PlaceDateDto,
+  ) {
+    return this.placeService.findOneWithUpdate(id, placeDateDto);
   }
 }
