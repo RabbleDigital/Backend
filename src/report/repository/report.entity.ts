@@ -8,10 +8,9 @@ import { Place } from '../../place/repository/place.entity';
 export const ReportDatabaseName = 'reports';
 
 export enum ReportStatus {
-  Active = 'active',
+  Report = 'report',
+  Update = 'update',
   Adjusted = 'adjusted',
-  AutoAdjusted = 'autoAdjusted',
-  Archived = 'archived',
 }
 
 @DatabaseEntity({ collection: ReportDatabaseName })
@@ -34,11 +33,7 @@ export class Report extends DatabaseMongoEntityAbstract {
   @Prop({ type: String })
   name: string;
 
-  @Prop({
-    type: String,
-    enum: Object.values(ReportStatus),
-    default: ReportStatus.Active,
-  })
+  @Prop({ type: String, enum: Object.values(ReportStatus) })
   status: ReportStatus;
 }
 

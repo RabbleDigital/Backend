@@ -63,6 +63,9 @@ export class Place extends DatabaseMongoEntityAbstract {
   @Prop({ required: true, index: true, type: String })
   readonly placeId: string;
 
+  @Prop({ required: true, type: Number })
+  readonly utcOffset: number;
+
   @Prop(raw(openingHoursRaw))
   readonly openingHours: PlaceOpeningHours;
 

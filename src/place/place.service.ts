@@ -137,6 +137,7 @@ export class PlaceService {
         coordinates: [place.geometry.location.lng, place.geometry.location.lat],
       },
       placeId: place.place_id,
+      utcOffset: place.utc_offset,
       photo,
       openingHours: {
         periods: place?.opening_hours?.periods,
@@ -147,6 +148,8 @@ export class PlaceService {
   }
 
   private findCategory(types, index = 0) {
+    if (types.length < index + 1) return;
+
     const category = GOOGLE_TYPES_MAP.get(types[index]);
 
     if (category) return category;

@@ -65,15 +65,3 @@ export function AdjustReport(): PropertyDecorator {
     UseGuards(JwtAuthGuard),
   );
 }
-
-export function ArchiveReport(): PropertyDecorator {
-  return applyDecorators(
-    HttpCode(HttpStatus.NO_CONTENT),
-    ApiResponse({
-      description: 'Success',
-      status: 204,
-    }),
-    ApiBearerAuth(),
-    UseGuards(JwtAuthGuard),
-  );
-}

@@ -4,8 +4,6 @@ import {
   PaginationSort,
 } from '../../shared/pagination/decorators/pagination.decorator';
 import { IPaginationSort } from '../../shared/pagination/interfaces/pagination.interface';
-import { Expose } from 'class-transformer';
-import { ReportStatus } from '../repository/report.entity';
 
 export class FindReportsDto {
   @PaginationPage(1)
@@ -16,7 +14,4 @@ export class FindReportsDto {
 
   @PaginationSort('createdAt@asc')
   readonly sort: IPaginationSort;
-
-  @Expose()
-  readonly status: ReportStatus;
 }

@@ -54,6 +54,9 @@ export class PlaceDto {
   category: string;
 
   @ApiProperty()
+  utcOffset: number;
+
+  @ApiProperty()
   openingHours: OpeningHours;
 
   @ApiProperty()
@@ -75,6 +78,7 @@ export class PlaceDto {
     location,
     photo,
     category,
+    utcOffset,
     openingHours,
     isHaveCrowd,
     crowd,
@@ -87,6 +91,7 @@ export class PlaceDto {
     this.location = location;
     this.photo = photo;
     this.category = category;
+    this.utcOffset = utcOffset;
     this.openingHours = openingHours;
     this.isHaveCrowd = isHaveCrowd;
     this.crowd = crowd;

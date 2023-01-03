@@ -21,7 +21,6 @@ export class ReportService {
   ) {}
 
   async create(createReportDto: CreateReportDto, { day, hour }: PlaceDateDto) {
-    let status;
     const currentDay = WEEK_DAYS[day];
 
     let place = await this.placeService.findOneById(createReportDto.place);
@@ -36,27 +35,33 @@ export class ReportService {
         isHaveCrowd: true,
       });
 
-      status = ReportStatus.AutoAdjusted;
+      createReportDto.status = ReportStatus.Update;
+    } else if (createReportDto.status === ReportStatus.Update) {
+      const forecast = [...place.forecast];
+      forecast[currentDay].crowdMeter[hour] = createReportDto.crowd;
+
+      place = await this.placeService.updateOneById(place._id.toString(), {
+        forecast,
+      });
     }
 
     await this.reportRepository.create({
       ...createReportDto,
-      day: currentDay,
       hour,
-      status,
+      day: currentDay,
     });
 
     return new PlaceDto(this.placeService.crowdTransform(place, { day, hour }));
   }
 
-  async findAll(status, page, limit) {
+  async findAll(page, limit) {
     const skip: number = this.paginationService.skip(page, limit);
     const join = { path: 'place', select: 'title category address photo' };
 
-    const count = await this.reportRepository.getTotal({ status });
+    const count = await this.reportRepository.getTotal();
     const rows = await this.reportRepository
       .findAll(
-        { status },
+        {},
         {
           skip,
           limit,
@@ -98,16 +103,6 @@ export class ReportService {
 
     await this.placeService.updateOneById(report.place.toString(), {
       forecast,
-    });
-
-    return;
-  }
-
-  async archive(id: string) {
-    const report = await this.findById(id);
-
-    await this.reportRepository.updateOneById(report._id.toString(), {
-      status: ReportStatus.Archived,
     });
 
     return;

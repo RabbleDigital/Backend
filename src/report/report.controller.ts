@@ -7,7 +7,6 @@ import { FindReportsDto } from './dto/find-reports.dto';
 import { AdjustReportDto } from './dto/adjust-report.dto';
 import {
   AdjustReport,
-  ArchiveReport,
   CreateReport,
   FindReports,
 } from './report.serialization';
@@ -30,19 +29,13 @@ export class ReportController {
 
   @Get()
   @FindReports()
-  findAll(@Query() { status, page, limit }: FindReportsDto) {
-    return this.reportService.findAll(status, page, limit);
+  findAll(@Query() { page, limit }: FindReportsDto) {
+    return this.reportService.findAll(page, limit);
   }
 
   @Put(':id/adjust')
   @AdjustReport()
   adjust(@Param('id') id: string, @Body() { custom }: AdjustReportDto) {
     return this.reportService.adjust(id, custom);
-  }
-
-  @Put(':id/archive')
-  @ArchiveReport()
-  archive(@Param('id') id: string) {
-    return this.reportService.archive(id);
   }
 }

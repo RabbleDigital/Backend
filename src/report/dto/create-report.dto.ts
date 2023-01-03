@@ -1,12 +1,15 @@
 import {
+  IsEnum,
   IsInt,
   IsMongoId,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Max,
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ReportStatus } from '../repository/report.entity';
 
 export class CreateReportDto {
   @IsNotEmpty()
@@ -20,11 +23,16 @@ export class CreateReportDto {
   @Max(100)
   crowd: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   description: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   name: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @IsEnum(ReportStatus)
+  status: ReportStatus;
 }
