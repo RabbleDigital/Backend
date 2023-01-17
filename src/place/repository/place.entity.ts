@@ -75,6 +75,8 @@ export class Place extends DatabaseMongoEntityAbstract {
   @Prop({ type: Number })
   readonly crowd: number;
 
+  readonly distance: number;
+
   @Prop({ default: false, type: Boolean })
   readonly isHaveCrowd: boolean;
 

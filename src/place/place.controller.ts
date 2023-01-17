@@ -9,6 +9,8 @@ import {
   FindPlaces,
 } from './place.serialization';
 import { PlaceDateDto } from './dto/place-date.dto';
+import { CursorDto } from './dto/cursor.dto';
+import { ListPlacesDto } from './dto/list-places.dto';
 
 @Controller('places')
 @ApiTags('Places')
@@ -23,6 +25,16 @@ export class PlaceController {
     @Query() placeDateDto: PlaceDateDto,
   ) {
     return this.placeService.findAll(lat, lon, distance, placeDateDto);
+  }
+
+  @Get('list')
+  @FindPlaces()
+  list(
+    @Query() listPlacesDto: ListPlacesDto,
+    @Query() placeDateDto: PlaceDateDto,
+    @Query() cursorDto: CursorDto,
+  ) {
+    return this.placeService.list(listPlacesDto, placeDateDto, cursorDto);
   }
 
   @Get(':id')

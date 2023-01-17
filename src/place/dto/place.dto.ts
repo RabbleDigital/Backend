@@ -65,6 +65,8 @@ export class PlaceDto {
   @ApiProperty()
   crowd: number;
 
+  distance: number;
+
   @ApiProperty()
   createdAt: Date;
 
@@ -82,6 +84,7 @@ export class PlaceDto {
     openingHours,
     isHaveCrowd,
     crowd,
+    distance,
     createdAt,
     updatedAt,
   }: Place) {
@@ -95,6 +98,7 @@ export class PlaceDto {
     this.openingHours = openingHours;
     this.isHaveCrowd = isHaveCrowd;
     this.crowd = crowd;
+    this.distance = distance;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }

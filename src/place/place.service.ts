@@ -12,6 +12,8 @@ import {
 import { PlaceDto } from './dto/place.dto';
 import { PlaceDetails } from '../shared/interfaces/google';
 import { PlaceDateDto } from './dto/place-date.dto';
+import { ListPlacesDto } from './dto/list-places.dto';
+import { CursorDto } from './dto/cursor.dto';
 
 @Injectable()
 export class PlaceService {
@@ -32,6 +34,42 @@ export class PlaceService {
         },
       },
     });
+
+    return places.map(
+      (place) => new PlaceDto(this.crowdTransform(place, { day, hour })),
+    );
+  }
+
+  async list(
+    { lat, lon, search }: ListPlacesDto,
+    { day, hour }: PlaceDateDto,
+    { skip, limit }: CursorDto,
+  ) {
+    const maxDistance = 6371 * 1000;
+
+    const places = await this.placeRepository.raw([
+      {
+        $geoNear: {
+          near: {
+            type: 'Point',
+            coordinates: [+lon, +lat],
+          },
+          distanceField: 'distance',
+          spherical: true,
+          maxDistance,
+        },
+      },
+      {
+        $match: {
+          title: {
+            $regex: search,
+            $options: 'i',
+          },
+        },
+      },
+      { $limit: +limit },
+      { $skip: +skip },
+    ]);
 
     return places.map(
       (place) => new PlaceDto(this.crowdTransform(place, { day, hour })),
