@@ -45,7 +45,7 @@ export class PlaceService {
     { day, hour }: PlaceDateDto,
     { skip, limit }: CursorDto,
   ) {
-    const maxDistance = 6371 * 1000;
+    const maxDistance = 6371 * 2 * 1000;
 
     const places = await this.placeRepository.raw([
       {
@@ -67,8 +67,8 @@ export class PlaceService {
           },
         },
       },
-      { $limit: +limit },
       { $skip: +skip },
+      { $limit: +limit },
     ]);
 
     return places.map(
