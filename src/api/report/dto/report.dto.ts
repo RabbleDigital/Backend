@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { PopulatedDoc } from 'mongoose';
 
 import { Report, ReportStatus } from '../repository/report.entity';
-import { Place } from '../../place/repository/place.entity';
+import { Place } from '@api/place/repository/place.entity';
 
 class ReportPlace {
   @ApiProperty()
