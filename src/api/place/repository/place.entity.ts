@@ -86,4 +86,5 @@ export class Place extends DatabaseMongoEntityAbstract {
 
 export const PlaceSchema = SchemaFactory.createForClass(Place);
 
+PlaceSchema.index({ location: '2dsphere' });
 PlaceSchema.loadClass(Place);
