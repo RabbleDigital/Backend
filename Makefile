@@ -1,5 +1,5 @@
 build:
-	docker build . -t techlexity/rabble:back
+	docker build --platform linux/amd64 . -t techlexity/rabble:back
 
 prune:
 	docker image prune -f

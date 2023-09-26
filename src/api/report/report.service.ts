@@ -1,16 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { times } from 'lodash';
 
 import { CreateReportDto } from './dto/create-report.dto';
-import { WEEK_DAYS } from '../shared/config/constants';
-import { PaginationService } from '../shared/pagination/services/pagination.service';
+import { WEEK_DAYS } from '@shared/config/constants';
+import { PaginationService } from '@shared/pagination/services/pagination.service';
 import { ReportRepository } from './repository/report.repository';
 import { ReportDto } from './dto/report.dto';
 import { PlaceService } from '../place/place.service';
 import { ReportStatus } from './repository/report.entity';
 import { PlaceDto } from '../place/dto/place.dto';
-import { ENUM_PAGINATION_SORT_TYPE } from '../shared/pagination/constants/pagination.enum.constant';
+import { ENUM_PAGINATION_SORT_TYPE } from '@shared/pagination/constants/pagination.enum.constant';
 import { PlaceDateDto } from '../place/dto/place-date.dto';
+import { Place } from '@api/place/repository/place.entity';
 
 @Injectable()
 export class ReportService {
@@ -20,35 +25,25 @@ export class ReportService {
     private readonly paginationService: PaginationService,
   ) {}
 
-  async create(createReportDto: CreateReportDto, { day, hour }: PlaceDateDto) {
-    const currentDay = WEEK_DAYS[day];
+  async create(data: CreateReportDto, { day, hour }: PlaceDateDto) {
+    await this.checkTodayReport(data);
 
-    let place = await this.placeService.findOneById(createReportDto.place);
+    let place = await this.placeService.findOneById(data.place);
     if (!place.isHaveCrowd) {
-      const forecast = times(7, (index) => ({
-        dayInt: index,
-        crowdMeter: times(24, () => createReportDto.crowd),
-      }));
-
-      place = await this.placeService.updateOneById(place._id.toString(), {
-        forecast,
-        isHaveCrowd: true,
-      });
-
-      createReportDto.status = ReportStatus.Update;
-    } else if (createReportDto.status === ReportStatus.Update) {
-      const forecast = [...place.forecast];
-      forecast[currentDay].crowdMeter[hour] = createReportDto.crowd;
-
-      place = await this.placeService.updateOneById(place._id.toString(), {
-        forecast,
-      });
+      place = await this.updatePlaceWithInitialForecast(place, data.crowd);
+    } else if (data.status === ReportStatus.Update) {
+      place = await this.updatePlaceWithUpdatedForecast(
+        place,
+        day,
+        hour,
+        data.crowd,
+      );
     }
 
     await this.reportRepository.create({
-      ...createReportDto,
+      ...data,
       hour,
-      day: currentDay,
+      day: WEEK_DAYS[day],
     });
 
     return new PlaceDto(this.placeService.crowdTransform(place, { day, hour }));
@@ -106,5 +101,60 @@ export class ReportService {
     });
 
     return;
+  }
+
+  private async checkTodayReport(createReportDto: CreateReportDto) {
+    const today = new Date();
+    const startDay = new Date(today.setUTCHours(0, 0, 0, 0));
+
+    const exists = await this.reportRepository.exists({
+      place: createReportDto.place,
+      deviceId: createReportDto.deviceId,
+      createdAt: { $gte: startDay },
+    });
+
+    if (exists) {
+      throw new ForbiddenException('Already sent report today');
+    }
+  }
+
+  private async updatePlaceWithInitialForecast(place: Place, crowd: number) {
+    const forecast = this.generateInitialForecast(crowd);
+
+    place = await this.placeService.updateOneById(place._id.toString(), {
+      forecast,
+      isHaveCrowd: true,
+    });
+
+    return place;
+  }
+
+  private generateInitialForecast(crowd: number) {
+    return times(7, (index) => ({
+      dayInt: index,
+      crowdMeter: times(24, () => crowd),
+    }));
+  }
+
+  private async updatePlaceWithUpdatedForecast(
+    place: Place,
+    day: number,
+    hour: number,
+    crowd: number,
+  ) {
+    const currentDay = WEEK_DAYS[day];
+    const forecast = [...place.forecast];
+    const currentCrowd = forecast[currentDay].crowdMeter[hour];
+
+    const delta = Math.abs(currentCrowd - crowd);
+    const deltaChunk = Math.ceil(delta * 0.25);
+
+    forecast[currentDay].crowdMeter[hour] = currentCrowd + deltaChunk;
+
+    place = await this.placeService.updateOneById(place._id.toString(), {
+      forecast,
+    });
+
+    return place;
   }
 }

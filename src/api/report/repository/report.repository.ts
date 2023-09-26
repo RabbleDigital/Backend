@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 
-import { DatabaseMongoRepositoryAbstract } from '../../shared/database/abstracts/database.mongo-repository.abstract';
+import { DatabaseMongoRepositoryAbstract } from '@shared/database/abstracts/database.mongo-repository.abstract';
 import { Report } from './report.entity';
-import { IDatabaseRepository } from '../../shared/database/interfaces/database.repository.interface';
-import { DatabaseModel } from '../../shared/database/decorators/database.decorator';
+import { IDatabaseRepository } from '@shared/database/interfaces/database.repository.interface';
+import { DatabaseModel } from '@shared/database/decorators/database.decorator';
 
 @Injectable()
 export class ReportRepository

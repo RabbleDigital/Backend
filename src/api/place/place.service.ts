@@ -1,16 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PlaceRepository } from './repository/place.repository';
-import { GoogleService } from '../shared/google/google.service';
-import { BestTimeService } from '../shared/best-time/best-time.service';
+import { GoogleService } from '@shared/google/google.service';
+import { BestTimeService } from '@shared/best-time/best-time.service';
 import { Place } from './repository/place.entity';
 import {
   GOOGLE_TYPES_MAP,
   METRES_IN_MILE,
   WEEK_DAYS,
-} from '../shared/config/constants';
+} from '@shared/config/constants';
 import { PlaceDto } from './dto/place.dto';
-import { PlaceDetails } from '../shared/interfaces/google';
+import { PlaceDetails } from '@shared/interfaces/google';
 import { PlaceDateDto } from './dto/place-date.dto';
 import { ListPlacesDto } from './dto/list-places.dto';
 import { CursorDto } from './dto/cursor.dto';

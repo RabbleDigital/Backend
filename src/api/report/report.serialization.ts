@@ -10,7 +10,7 @@ import { ReportDto } from './dto/report.dto';
 import {
   IBadRequestException,
   IUnauthorizedException,
-} from '../shared/interfaces/error';
+} from '@shared/interfaces/error';
 import { JwtAuthGuard } from '../auth/auth.guard';
 
 class ReportSerialization {

@@ -2,8 +2,8 @@ import {
   PaginationLimit,
   PaginationPage,
   PaginationSort,
-} from '../../shared/pagination/decorators/pagination.decorator';
-import { IPaginationSort } from '../../shared/pagination/interfaces/pagination.interface';
+} from '@shared/pagination/decorators/pagination.decorator';
+import { IPaginationSort } from '@shared/pagination/interfaces/pagination.interface';
 
 export class FindReportsDto {
   @PaginationPage(1)

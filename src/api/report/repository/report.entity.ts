@@ -1,9 +1,9 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { PopulatedDoc, Schema } from 'mongoose';
 
-import { DatabaseEntity } from '../../shared/database/decorators/database.decorator';
-import { DatabaseMongoEntityAbstract } from '../../shared/database/abstracts/database.mongo-entity.abstract';
-import { Place } from '../../place/repository/place.entity';
+import { DatabaseEntity } from '@shared/database/decorators/database.decorator';
+import { DatabaseMongoEntityAbstract } from '@shared/database/abstracts/database.mongo-entity.abstract';
+import { Place } from '@api/place/repository/place.entity';
 
 export const ReportDatabaseName = 'reports';
 
@@ -32,6 +32,9 @@ export class Report extends DatabaseMongoEntityAbstract {
 
   @Prop({ type: String })
   name: string;
+
+  @Prop({ type: String })
+  deviceId: string;
 
   @Prop({ type: String, enum: Object.values(ReportStatus) })
   status: ReportStatus;

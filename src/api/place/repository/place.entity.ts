@@ -1,12 +1,12 @@
 import { Prop, raw, SchemaFactory } from '@nestjs/mongoose';
 
-import { DatabaseEntity } from '../../shared/database/decorators/database.decorator';
-import { DatabaseMongoEntityAbstract } from '../../shared/database/abstracts/database.mongo-entity.abstract';
+import { DatabaseEntity } from '@shared/database/decorators/database.decorator';
+import { DatabaseMongoEntityAbstract } from '@shared/database/abstracts/database.mongo-entity.abstract';
 import {
   PlaceLocation,
   PlaceForecast,
   PlaceOpeningHours,
-} from '../../shared/interfaces/place';
+} from '@shared/interfaces/place';
 
 export const PlaceDatabaseName = 'places';
 

@@ -7,12 +7,14 @@ import { NewForecast } from '../interfaces/best-time';
 
 @Injectable()
 export class BestTimeService {
-  private readonly BEST_TIME_URL;
+  private readonly BEST_TIME_URL: string;
+  private readonly BEST_TIME_API_KEY: string;
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
     this.BEST_TIME_URL = this.configService.get('bestTime.url');
+    this.BEST_TIME_API_KEY = this.configService.get('bestTime.privateKey');
   }
 
   async newForecast(venue_name: string, venue_address: string) {
@@ -25,7 +27,7 @@ export class BestTimeService {
             params: {
               venue_name,
               venue_address,
-              api_key_private: this.configService.get('bestTime.privateKey'),
+              api_key_private: this.BEST_TIME_API_KEY,
             },
           },
         )

@@ -35,4 +35,8 @@ export class CreateReportDto {
   @IsString()
   @IsEnum(ReportStatus)
   status: ReportStatus;
+
+  @IsNotEmpty()
+  @IsString()
+  deviceId: string;
 }
