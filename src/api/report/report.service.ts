@@ -149,7 +149,11 @@ export class ReportService {
     const delta = Math.abs(currentCrowd - crowd);
     const deltaChunk = Math.ceil(delta * 0.25);
 
-    forecast[currentDay].crowdMeter[hour] = currentCrowd + deltaChunk;
+    if (crowd > currentCrowd) {
+      forecast[currentDay].crowdMeter[hour] = currentCrowd + deltaChunk;
+    } else {
+      forecast[currentDay].crowdMeter[hour] = currentCrowd - deltaChunk;
+    }
 
     place = await this.placeService.updateOneById(place._id.toString(), {
       forecast,
